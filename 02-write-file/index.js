@@ -30,7 +30,6 @@ rl.on('close', () => {
 
 // Обработка принудительного завершения процесса (Ctrl + C)
 process.on('SIGINT', () => {
-  console.log('Принудительное завершение процесса.');
   rl.close();
   outputStream.close();
 });
