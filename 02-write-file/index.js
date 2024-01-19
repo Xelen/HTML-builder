@@ -3,7 +3,7 @@ const readline = require('readline');
 const path = require('path');
 
 // Создание потока записи в файл
-const outputStream = fs.createWriteStream(path.join(__dirname, 'output.txt'));
+const outputStream = fs.createWriteStream(path.join(__dirname, 'text.txt'));
 
 // Создание интерфейса readline
 const rl = readline.createInterface({
