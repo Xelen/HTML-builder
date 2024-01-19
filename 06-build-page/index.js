@@ -17,9 +17,25 @@ async function copyDir(src, dest) {
   }
 }
 
+async function clearDir(directory) {
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  for (let entry of entries) {
+    const currentPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await clearDir(currentPath);
+      await fs.rmdir(currentPath);
+    } else {
+      await fs.unlink(currentPath);
+    }
+  }
+}
+
 async function main() {
   try {
     const distDir = path.join(__dirname, 'project-dist');
+    if (await exists(distDir)) {
+      await clearDir(distDir);
+    }
     await fs.mkdir(distDir, { recursive: true });
 
     const templatePath = path.join(__dirname, 'template.html');
@@ -65,5 +81,12 @@ async function main() {
     console.error(err);
   }
 }
-
+async function exists(path) {
+  try {
+    await fs.access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 main();
