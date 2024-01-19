@@ -1,6 +1,26 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+// Пути для функции mergeStyles
+const stylesDir = path.join(__dirname, 'styles');
+const outputFilePath = path.join(__dirname, 'project-dist', 'style.css');
+
+async function mergeStyles() {
+  try {
+    const files = await fs.readdir(stylesDir);
+    const cssFiles = files.filter((file) => path.extname(file) === '.css');
+    let styles = '';
+    for (const file of cssFiles) {
+      const filePath = path.join(stylesDir, file);
+      const data = await fs.readFile(filePath, 'utf8');
+      styles += data + '\n';
+    }
+    await fs.writeFile(outputFilePath, styles);
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
 async function copyDir(src, dest) {
   await fs.mkdir(dest, { recursive: true });
   const entries = await fs.readdir(src, { withFileTypes: true });
@@ -59,20 +79,7 @@ async function main() {
     const indexPath = path.join(distDir, 'index.html');
     await fs.writeFile(indexPath, templateContent);
 
-    const stylesDir = path.join(__dirname, 'styles');
-    const files = await fs.readdir(stylesDir);
-    let stylesContent = '';
-
-    for (const file of files) {
-      if (path.extname(file) === '.css') {
-        const filePath = path.join(stylesDir, file);
-        const content = await fs.readFile(filePath, 'utf-8');
-        stylesContent += content + '\n';
-      }
-    }
-
-    const stylesPath = path.join(distDir, 'style.css');
-    await fs.writeFile(stylesPath, stylesContent);
+    await mergeStyles();
 
     const assetsSrcPath = path.join(__dirname, 'assets');
     const assetsDestPath = path.join(distDir, 'assets');
