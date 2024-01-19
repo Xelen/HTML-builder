@@ -4,6 +4,8 @@ const path = require('path');
 // Пути для функции mergeStyles
 const stylesDir = path.join(__dirname, 'styles');
 const outputFilePath = path.join(__dirname, 'project-dist', 'style.css');
+const assetsSrcPath = path.join(__dirname, 'assets');
+const assetsDestPath = path.join(__dirname, 'project-dist', 'assets');
 
 async function mergeStyles() {
   try {
@@ -49,7 +51,14 @@ async function clearDir(directory) {
     }
   }
 }
-
+async function exists(path) {
+  try {
+    await fs.access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 async function main() {
   try {
     const distDir = path.join(__dirname, 'project-dist');
@@ -81,19 +90,10 @@ async function main() {
 
     await mergeStyles();
 
-    const assetsSrcPath = path.join(__dirname, 'assets');
-    const assetsDestPath = path.join(distDir, 'assets');
     await copyDir(assetsSrcPath, assetsDestPath);
   } catch (err) {
     console.error(err);
   }
 }
-async function exists(path) {
-  try {
-    await fs.access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+
 main();

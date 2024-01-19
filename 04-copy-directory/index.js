@@ -1,10 +1,22 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-async function createCopyDirectory() {
-  const copyDirPath = path.join(__dirname, 'files-copy');
-  await fs.mkdir(copyDirPath, { recursive: true });
+async function copyDir(src, dest) {
+  await fs.mkdir(dest, { recursive: true });
+  const entries = await fs.readdir(src, { withFileTypes: true });
+
+  for (let entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDir(srcPath, destPath);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
+  }
 }
+
 async function clearDir(directory) {
   const entries = await fs.readdir(directory, { withFileTypes: true });
   for (let entry of entries) {
@@ -17,27 +29,24 @@ async function clearDir(directory) {
     }
   }
 }
-
-async function readFilesDirectory(directory) {
-  return fs.readdir(directory);
-}
-async function copyFiles(sourceDirPath, copyDirPath, files) {
-  for (const file of files) {
-    const sourceFilePath = path.join(sourceDirPath, file);
-    const destFilePath = path.join(copyDirPath, file);
-    await fs.copyFile(sourceFilePath, destFilePath);
+async function exists(path) {
+  try {
+    await fs.access(path);
+    return true;
+  } catch {
+    return false;
   }
 }
-async function copyDir() {
+async function main() {
   const sourceDirPath = path.join(__dirname, 'files');
   const copyDirPath = path.join(__dirname, 'files-copy');
 
-  await createCopyDirectory();
-  await clearDir(copyDirPath); // Очищаем директорию перед копированием
-  const sourceFiles = await readFilesDirectory(sourceDirPath);
-  await copyFiles(sourceDirPath, copyDirPath, sourceFiles);
+  if (await exists(copyDirPath)) {
+    await clearDir(copyDirPath);
+  }
+  await copyDir(sourceDirPath, copyDirPath);
+
+  console.log('Скопировано успешно.');
 }
 
-copyDir()
-  .then(() => console.log('Скопировано успешно.'))
-  .catch((err) => console.error('Ошибка в копировании:', err));
+main().catch((err) => console.error('Ошибка в копировании:', err));
