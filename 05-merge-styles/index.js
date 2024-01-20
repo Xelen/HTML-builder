@@ -12,7 +12,7 @@ async function mergeStyles() {
     let styles = ''; // задаем пустую переменную, куда сгрузим все содержимое файлов из cssFiles
     for (const file of cssFiles) {
       //проход по каждому файлу
-      const filePath = path.join(stylesDir, file); // берем патч на файл
+      const filePath = path.join(stylesDir, file); // берем путь на файл
       const data = await fs.readFile(filePath, 'utf8'); // читаем этот файл
       styles += data + '\n'; // добавляем содержимое  в переменную
     }

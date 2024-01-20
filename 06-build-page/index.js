@@ -53,7 +53,7 @@ async function clearDir(directory) {
 }
 async function exists(path) {
   try {
-    await fs.access(path);
+    await fs.stat(path);
     return true;
   } catch {
     return false;
