@@ -15,7 +15,7 @@ console.log('Введите текст (или введите exit для вых
 
 // Обработка ввода пользователя
 rl.on('line', (input) => {
-  if (input.trim() === 'exit') {
+  if (input.toString().toLowerCase().trim() === 'exit') {
     rl.close();
   } else {
     outputStream.write(input + '\n');
